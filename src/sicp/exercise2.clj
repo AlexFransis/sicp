@@ -1,6 +1,5 @@
 (ns sicp.exercise2)
 
-
 (defn my-cons
   [x y]
   (let [dispatch (fn [m]
@@ -18,7 +17,6 @@
   [z]
   (z 1))
 
-
 ;; Exercise 2.4
 (defn my-cons2
   "Returns a function that takes a selector function
@@ -35,14 +33,6 @@
   "Returns the second value of a cons cell"
   [cons-cell]
   (cons-cell (fn [_ q] q)))
-
-
-(def ninenine (my-cons2 9 8))
-
-(car ninenine)
-
-(cdr ninenine)
-
 
 ;; Exercise 2.7
 (defn make-interval
@@ -111,3 +101,44 @@
                                       (conj r (first coll))
                                       r))))]
     (my-reverse (iter args '()))))
+
+;; Exercise 2.23
+(defn my-reduce
+  [operator initial coll]
+  (if (not (seq coll))
+    initial
+    (operator (first coll) (my-reduce operator initial (rest coll)))))
+
+(defn map-as-reduce
+  [f coll]
+  (my-reduce (fn [val acc]
+               (conj acc (f val)))
+             '()
+             coll))
+
+(defn filter-as-reduce
+  [predicate coll]
+  (my-reduce (fn [val acc] (if (predicate val)
+                            (conj acc val)
+                            acc)) 
+             '()
+             coll))
+
+(defn count-as-reduce
+  [coll]
+  (my-reduce (fn [val acc] (inc acc)) 0 coll))
+
+
+(defn accumulate-n
+  [f initial colls]
+  (if (not (seq colls))
+    nil
+    (cons (my-reduce f initial (map-as-reduce (fn [c] (first c)) colls))
+          (accumulate-n f initial (rest colls)))))
+
+(accumulate-n + 0 (list (list 1  2  3)
+                        (list 4  5  6)
+                        (list 7  8  9)
+                        (list 10 11 12)))
+;;                      ==============
+;;                      =>   (22 26 30)
