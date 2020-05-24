@@ -131,14 +131,15 @@
 
 (defn accumulate-n
   [f initial colls]
-  (if (not (seq colls))
+  (if (not (seq (first colls)))
     nil
     (cons (my-reduce f initial (map-as-reduce (fn [c] (first c)) colls))
-          (accumulate-n f initial (rest colls)))))
+          (accumulate-n f initial (map-as-reduce (fn [c] (rest c)) colls)))))
 
-(accumulate-n + 0 (list (list 1  2  3)
-                        (list 4  5  6)
-                        (list 7  8  9)
-                        (list 10 11 12)))
-;;                      ==============
-;;                      =>   (22 26 30)
+(def matrix (list (list 1  2  3)
+                  (list 4  5  6)
+                  (list 7  8  9)
+                  (list 10 11 12)))
+
+(accumulate-n * 1 matrix) ;; =>   (22 26 30)
+
