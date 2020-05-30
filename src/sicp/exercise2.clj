@@ -1,6 +1,5 @@
 (ns sicp.exercise2)
 
-
 (defn my-cons
   [x y]
   (let [dispatch (fn [m]
@@ -17,7 +16,6 @@
 (defn cdr
   [z]
   (z 1))
-
 
 ;; Exercise 2.4
 (defn my-cons2
@@ -36,7 +34,6 @@
   [cons-cell]
   (cons-cell (fn [_ q] q)))
 
-
 (def ninenine (my-cons2 9 8))
 
 (car ninenine)
@@ -45,6 +42,8 @@
 
 
 ;; Exercise 2.7
+
+
 (defn make-interval
   [a b]
   (my-cons2 a b))
@@ -62,15 +61,15 @@
 (defn list-ref
   [items i]
   (if (= i 0)
-    (first items)
-    (recur (rest items) (dec i))))
+    (car items)
+    (recur (cdr items) (dec i))))
 
 (defn length
   [items]
   (let [length-iter (fn [coll r]
-                   (if (not (seq coll))
-                     r
-                     (recur (rest coll) (inc r))))]
+                      (if (not (seq coll))
+                        r
+                        (recur (rest coll) (inc r))))]
     (length-iter items 0)))
 
 (defn append
@@ -98,16 +97,49 @@
                       (recur (rest c) (conj result (first c)))))]
     (coll-iter coll '())))
 
+(defn my-reverse2
+  [coll]
+  (if (nil? (cdr coll))
+    (car coll)
+    (my-cons (my-reverse2 (cdr coll)) (car coll))))
+
+(defn my-list
+  [& args]
+  (letfn [(iter [coll]
+            (if (not (seq coll))
+              nil
+              (my-cons (first coll) (iter (rest coll)))))]
+    (iter args)))
+
 ;; Exercise 2.20
 (defn same-parity
   [& args]
   (let [parity-fn (fn [n] (mod n 2))
         parity (parity-fn (first args))
-        iter (fn [coll r]
+        iter (fn [coll acc]
                (if (empty? coll)
-                 r
+                 acc
                  (recur (rest coll) (if (= (parity-fn (first coll))
                                            parity)
-                                      (conj r (first coll))
-                                      r))))]
+                                      (conj acc (first coll))
+                                      acc))))]
     (my-reverse (iter args '()))))
+
+(defn scale-coll
+  [coll factor]
+  (let [scale-iter (fn [c acc]
+                     (if (not (seq c))
+                       acc
+                       (recur (rest c)
+                              (conj acc (* (first c)
+                                           factor)))))]
+    (apply list (scale-iter coll []))))
+
+(defn my-map
+  [f coll]
+  (let [map-iter (fn [c acc]
+                   (if (not (seq c))
+                     acc
+                     (recur (rest c)
+                            (conj acc (f (first c))))))]
+    (map-iter coll [])))
