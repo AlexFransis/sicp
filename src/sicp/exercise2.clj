@@ -1,4 +1,5 @@
-(ns sicp.exercise2)
+(ns sicp.exercise2
+  (:require [sicp.exercise1 :refer [prime?]]))
 
 (defn my-cons
   [x y]
@@ -120,7 +121,7 @@
   [predicate coll]
   (my-reduce (fn [val acc] (if (predicate val)
                             (conj acc val)
-                            acc)) 
+                            acc))
              '()
              coll))
 
@@ -141,5 +142,50 @@
                   (list 7  8  9)
                   (list 10 11 12)))
 
-(accumulate-n * 1 matrix) ;; =>   (22 26 30)
+(defn flatmap
+  [proc coll]
+  (reduce concat '() (map proc coll)))
+
+
+(defn prime-sum?
+  [[a b]]
+  (prime? (+ a b)))
+
+(defn make-pair-sum
+  [[a b]]
+  (list a b (+ a b)))
+
+(filter prime-sum? (flatmap
+                    (fn [i]
+                      (map (fn [j] (list i j))
+                           (range 1 (- i 1))))
+                    (range 1 7)))
+
+(defn prime-sum-pairs
+  [n]
+  (map make-pair-sum
+       (filter prime-sum? (flatmap
+                           (fn [i]
+                             (map (fn [j] (list i j))
+                                  (range 1 (- i 1))))
+                           (range 1 (inc n))))))
+
+(prime-sum-pairs 6)
+
+
+(defn memq
+  [item x]
+  (cond
+    (not (seq x)) false
+    (= item (first x)) x
+    :else (memq item (rest x))))
+
+
+(defn equal?
+  [a b]
+  (cond
+    (or (not (seq a)) (not (seq b))) false
+    (and (= (first a) (first b))
+         (= (rest a) (rest b))) true
+    :else (equal? (rest a) (rest b))))
 
